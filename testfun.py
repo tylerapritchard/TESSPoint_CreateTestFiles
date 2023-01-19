@@ -19,7 +19,7 @@ def create_test_array(ticlist,xlist,ylist,Sector, Camera, CCD):
 
 def create_test_file(ticlist,xlist,ylist,Sector, Camera, CCD):
     tic, ra, dec = create_test_array(ticlist,xlist,ylist,Sector, Camera, CCD)
-    f= open("testfiles/TEST_pix2radec_Sec{0}_Cam{1}_CCD{2}_stars2px.dat".format(str(Sector),str(Camera),str(CCD)),'w')
+    f= open("testfiles/TEST_pix2radec_Sec{:02d}_Cam{}_CCD{}_stars2px.dat".format(Sector,Camera,CCD),'w')
     f.write('# TIC RA DEC \n')
     for t_out,ra_out,dec_out in zip (tic,ra, dec):
         f.write('{0} {1} {2} \n'.format(t_out,ra_out,dec_out))
@@ -36,8 +36,8 @@ def multi_create_test_file(SectorCameraCCD):
 
 def create_reverse_file(SectorCameraCCD):
     Sector, Camera, CCD = SectorCameraCCD
-    wcsfile="testfiles/TEST_pix2radec_Sec{0}_Cam{1}_CCD{2}_stars2px.dat".format(str(Sector),str(Camera),str(CCD))
-    pixfile="testfiles/TEST_radec2pix_Sec{0}_Cam{1}_CCD{2}_stars2px.dat".format(str(Sector),str(Camera),str(CCD))
+    wcsfile="testfiles/TEST_pix2radec_Sec{:02d}_Cam{}_CCD{}_stars2px.dat".format(Sector,Camera,CCD)
+    pixfile="testfiles/TEST_radec2pix_Sec{:02d}_Cam{}_CCD{}_stars2px.dat".format(Sector,Camera,CCD)
     point=subprocess.run(["python","/Users/tapritc2/tessgi/tesspoint/tess-point/tess_stars2px.py",
                         "-s",str(Sector),"-f",wcsfile,"-o",pixfile],capture_output=True,text=True)
     return
@@ -45,7 +45,7 @@ def create_reverse_file(SectorCameraCCD):
 def calc_deviation_scc(SectorCameraCCD):
     Sector, Camera, CCD = SectorCameraCCD
     
-    pixfile="testfiles/TEST_radec2pix_Sec{0}_Cam{1}_CCD{2}_stars2px.dat".format(str(Sector),str(Camera),str(CCD))
+    pixfile="testfiles/TEST_radec2pix_Sec{:02d}_Cam{}_CCD{}_stars2px.dat".format(Sector,Camera,CCD)
     footprint_file='footprint_input.dat'
     
     footprint_df=pd.read_csv(footprint_file,delimiter=' ',names=['tic','x','y'],index_col=False)
@@ -54,5 +54,5 @@ def calc_deviation_scc(SectorCameraCCD):
     
     idx = final_df.index.intersection(footprint_df.index)
     dx=abs(final_df.loc[idx, 'x'] - footprint_df.loc[idx, 'x'])
-    dy=abs(final_df.loc[idx, 'x'] - footprint_df.loc[idx, 'x'])
+    dy=abs(final_df.loc[idx, 'y'] - footprint_df.loc[idx, 'y'])
     return len(idx),np.median(dx), np.max(dx), np.std(dx), np.median(dy), np.max(dy), np.std(dy), Sector, Camera, CCD
